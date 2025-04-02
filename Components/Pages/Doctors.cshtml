@@ -1,0 +1,70 @@
+@page "/doctors"
+@inject IHttpClientFactory HttpClientFactory
+
+<h3 class="text-primary">Doctors List</h3>
+
+@if (isLoading)
+{
+    <p class="text-info">Loading doctors...</p>
+}
+else if (hasError)
+{
+    <div class="alert alert-danger">
+        <strong>Error:</strong> @errorMessage
+    </div>
+}
+else if (doctors == null || doctors.Count == 0)
+{
+    <p class="text-warning">No doctors found.</p>
+}
+else
+{
+    <table class="table table-striped table-bordered table-hover">
+        <thead class="table-dark">
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Specialization</th>
+            <th>Email</th>
+            <th>Phone</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var doctor in doctors)
+        {
+            <tr>
+                <td>@doctor.FirstName</td>
+                <td>@doctor.LastName</td>
+                <td>@doctor.Specialization</td>
+                <td>@doctor.Email</td>
+                <td>@doctor.PhoneNumber</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Doctor> doctors;
+    private bool isLoading = true;
+    private bool hasError = false;
+    private string errorMessage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var httpClient = HttpClientFactory.CreateClient("ApiClient");
+            doctors = await httpClient.GetFromJsonAsync<List<Doctor>>("doctors");
+        }
+        catch (Exception ex)
+        {
+            hasError = true;
+            errorMessage = $"Failed to load doctors. Details: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

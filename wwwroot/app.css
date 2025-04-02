@@ -1,0 +1,76 @@
+/* app.css */
+
+/* Global resets and typography */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Figtree', sans-serif;
+    background-color: #f5f5f5; /* Use a neutral color instead of a gradient */
+    color: #333;
+}
+
+/* Navbar styling (unchanged) */
+.navbar {
+    background-color: #2F3B52;
+}
+.navbar-brand {
+    color: #fff !important;
+    font-weight: bold;
+}
+.nav-link {
+    color: #90a4ae;
+    transition: background-color 0.2s;
+}
+.nav-link:hover, .nav-link.active {
+    background-color: #24324A;
+}
+
+/* Tables (unchanged) */
+.table {
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+.table-hover tbody tr:hover {
+    background-color: #f1f1f1;
+}
+thead.thead-dark th {
+    background-color: #343a40;
+    color: white;
+}
+
+/* Primary button styling (unchanged) */
+.btn-primary {
+    background-color: #2F3B52;
+    border: none;
+    border-radius: 30px;
+    transition: transform 0.2s ease, background-color 0.2s;
+}
+.btn-primary:hover {
+    transform: scale(1.05);
+    background-color: #24324A;
+}
+
+/* Validation messages (unchanged) */
+.validation-message {
+    color: red;
+    font-size: 0.9rem;
+}
+
+/* Input group spacing (unchanged) */
+.input-group {
+    margin-bottom: 1rem;
+}
+
+/* Headings use Deep Navy (#2F3B52) */
+h1, h3 {
+    color: #2F3B52;
+}
+
+/* Footer (unchanged) */
+footer {
+    background-color: #343a40;
+    color: white;
+    padding: 1rem 0;
+    text-align: center;
+}

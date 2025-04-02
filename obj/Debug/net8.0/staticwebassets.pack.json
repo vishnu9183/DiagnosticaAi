@@ -1,0 +1,93 @@
+{
+  "Files": [
+    {
+      "Id": "/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/obj/Debug/net8.0/scopedcss/projectbundle/HealthcareApp.bundle.scp.css",
+      "PackagePath": "staticwebassets/HealthcareApp.bundle.scp.css"
+    },
+    {
+      "Id": "/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/wwwroot/Assets/Headshot.png",
+      "PackagePath": "staticwebassets/Assets/Headshot.png"
+    },
+    {
+      "Id": "/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/wwwroot/Assets/admin.png",
+      "PackagePath": "staticwebassets/Assets/admin.png"
+    },
+    {
+      "Id": "/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/wwwroot/Assets/ai1.png",
+      "PackagePath": "staticwebassets/Assets/ai1.png"
+    },
+    {
+      "Id": "/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/wwwroot/Assets/ai2.png",
+      "PackagePath": "staticwebassets/Assets/ai2.png"
+    },
+    {
+      "Id": "/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/wwwroot/Assets/ai3.png",
+      "PackagePath": "staticwebassets/Assets/ai3.png"
+    },
+    {
+      "Id": "/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/wwwroot/Assets/icon1.png",
+      "PackagePath": "staticwebassets/Assets/icon1.png"
+    },
+    {
+      "Id": "/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/wwwroot/Assets/icon2.png",
+      "PackagePath": "staticwebassets/Assets/icon2.png"
+    },
+    {
+      "Id": "/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/wwwroot/Assets/icon3.png",
+      "PackagePath": "staticwebassets/Assets/icon3.png"
+    },
+    {
+      "Id": "/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/wwwroot/Assets/image.png",
+      "PackagePath": "staticwebassets/Assets/image.png"
+    },
+    {
+      "Id": "/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/wwwroot/Assets/image1.jpg",
+      "PackagePath": "staticwebassets/Assets/image1.jpg"
+    },
+    {
+      "Id": "/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/wwwroot/Assets/image2.jpg",
+      "PackagePath": "staticwebassets/Assets/image2.jpg"
+    },
+    {
+      "Id": "/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/wwwroot/Assets/image3.jpg",
+      "PackagePath": "staticwebassets/Assets/image3.jpg"
+    },
+    {
+      "Id": "/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/wwwroot/Assets/patient1.jpg",
+      "PackagePath": "staticwebassets/Assets/patient1.jpg"
+    },
+    {
+      "Id": "/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/wwwroot/app.css",
+      "PackagePath": "staticwebassets/app.css"
+    },
+    {
+      "Id": "/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/wwwroot/bootstrap/bootstrap.min.css",
+      "PackagePath": "staticwebassets/bootstrap/bootstrap.min.css"
+    },
+    {
+      "Id": "/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/wwwroot/bootstrap/bootstrap.min.css.map",
+      "PackagePath": "staticwebassets/bootstrap/bootstrap.min.css.map"
+    },
+    {
+      "Id": "/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/wwwroot/favicon.png",
+      "PackagePath": "staticwebassets/favicon.png"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.HealthcareApp.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.build.HealthcareApp.props",
+      "PackagePath": "build\\HealthcareApp.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.HealthcareApp.props",
+      "PackagePath": "buildMultiTargeting\\HealthcareApp.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.HealthcareApp.props",
+      "PackagePath": "buildTransitive\\HealthcareApp.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

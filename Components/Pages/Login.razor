@@ -1,0 +1,158 @@
+@page "/"
+@layout HealthcareApp.Components.Layout.MainLayout
+@inject NavigationManager Navigation
+@inject IHttpClientFactory HttpClientFactory
+@rendermode InteractiveServer
+
+<!-- Foreground: Title + Login Container -->
+<div class="container d-flex flex-column align-items-center justify-content-center login-container">
+    <!-- Brand Title -->
+    <div class="brand-title">Diagnostica</div>
+
+    <!-- Login Card -->
+    <div class="card login-card mt-3">
+        <h3 class="text-center mb-4" style="color: #2F3B52;">Login</h3>
+
+        <div class="mb-3">
+            <label for="role" class="form-label">Select Role:</label>
+            <select id="role" @bind="selectedRole" class="form-select">
+                <option value="">Select Role</option>
+                <option value="Patient">Patient</option>
+                <option value="Doctor">Doctor</option>
+                <option value="Admin">Admin</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email:</label>
+            <input type="email" id="email" @bind="email" class="form-control" placeholder="Enter your email" />
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label">Password:</label>
+            <input type="password" id="password" @bind="password" class="form-control" placeholder="Enter your password" />
+        </div>
+
+        <button class="btn btn-primary w-100" @onclick="LoginUser">Login</button>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger mt-3">@errorMessage</div>
+        }
+    </div>
+</div>
+
+<!-- Page-specific CSS -->
+<style>
+   
+
+    body {
+        margin: 0;
+        padding: 0;
+        /* Use Inter now that it's linked globally */
+        font-family: 'Inter', sans-serif;
+        background: url("Assets/image3.jpg") no-repeat center center fixed;
+        background-size: cover;
+    }
+
+    .login-container {
+        min-height: 100vh;
+    }
+
+    .brand-title {
+        font-size: 4.5rem;
+        font-weight: 900;
+        color: #87CEEB; /* Sky Blue */
+        font-family: 'Inter', sans-serif; 
+        letter-spacing: 1.5px;
+        text-shadow: 0 0 3px rgba(47, 59, 82, 0.8);
+        -webkit-text-stroke: 1px black;
+        text-stroke: 1px black;
+    }
+
+    .login-card {
+        width: 400px;
+        border-radius: 12px;
+        background-color: rgba(245, 245, 245, 0.95);
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+        padding: 2rem;
+        animation: slideDown 0.8s ease-out;
+    }
+</style>
+
+@code {
+    private string selectedRole;
+    private string email;
+    private string password;
+    private string errorMessage;
+
+    private async Task LoginUser()
+    {
+        errorMessage = string.Empty;
+
+        if (string.IsNullOrEmpty(selectedRole) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+        {
+            errorMessage = "Please enter all required fields.";
+            return;
+        }
+
+        bool isAuthenticated = false;
+
+        // Direct Admin check:
+        if (selectedRole == "Admin" && email == "admin" && password == "admin@123")
+        {
+            isAuthenticated = true;
+            Navigation.NavigateTo("/Admin");
+            return;
+        }
+
+        var client = HttpClientFactory.CreateClient("ApiClient");
+
+        try
+        {
+            HttpResponseMessage response = null;
+
+            if (selectedRole == "Patient")
+            {
+                response = await client.PostAsJsonAsync("patients/login", new { Email = email, Password = password });
+                var content = await response.Content.ReadFromJsonAsync<dynamic>();
+                int patientId = content.GetProperty("patientId").GetInt32();
+                if (response.IsSuccessStatusCode)
+                {
+                    isAuthenticated = true;
+                    Navigation.NavigateTo($"/patients/{patientId}");
+                }
+            }
+            else if (selectedRole == "Doctor")
+            {
+                response = await client.PostAsJsonAsync("doctors/login", new { Email = email, Password = password });
+                var content = await response.Content.ReadFromJsonAsync<dynamic>();
+                int doctorId = content.GetProperty("doctorId").GetInt32();
+                if (response.IsSuccessStatusCode)
+                {
+                    isAuthenticated = true;
+                    Navigation.NavigateTo($"/doctors/{doctorId}");
+                }
+            }
+            else if (selectedRole == "Admin")
+            {
+                response = await client.PostAsJsonAsync("admins/login", new { Email = email, Password = password });
+                if (response.IsSuccessStatusCode)
+                {
+                    isAuthenticated = true;
+                    Navigation.NavigateTo($"/admins");
+                }
+            }
+
+            if (!isAuthenticated)
+            {
+                errorMessage = "Invalid email or password.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Login failed. Please try again.";
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+}

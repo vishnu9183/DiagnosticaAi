@@ -1,0 +1,48 @@
+@page "/notifications"
+@inject HttpClient Http
+
+<h3 class="text-primary">Notifications</h3>
+
+<div class="mb-3">
+    <label for="patientId" class="form-label">Patient ID:</label>
+    <input type="number" id="patientId" @bind="patientId" class="form-control" />
+    <button class="btn btn-primary mt-2" @onclick="FetchNotifications">Get Notifications</button>
+</div>
+
+@if (notifications == null)
+{
+    <p>Enter a valid Patient ID to fetch notifications.</p>
+}
+else if (notifications.Count == 0)
+{
+    <p>No notifications found for this patient.</p>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var notification in notifications)
+        {
+            <li class="list-group-item">
+                @notification.Message
+                <span class="badge bg-success ms-2">@notification.IsRead ? "Read" : "Unread"</span>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private int patientId;
+    private List<Notification> notifications;
+
+    private async Task FetchNotifications()
+    {
+        try
+        {
+            notifications = await Http.GetFromJsonAsync<List<Notification>>($"notifications/{patientId}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching notifications: {ex.Message}");
+        }
+    }
+}

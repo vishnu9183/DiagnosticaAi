@@ -1,0 +1,126 @@
+is_global = true
+build_property.MudDebugAnalyzer = 
+build_property.MudAllowedAttributePattern = 
+build_property.MudAllowedAttributeList = 
+build_property.TargetFramework = net8.0
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = HealthcareApp
+build_property.RootNamespace = HealthcareApp
+build_property.ProjectDir = /Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = /Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp
+build_property._RazorSourceGeneratorDebug = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/App.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BcHAucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Pages/AddDoctor.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9BZGREb2N0b3IucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Pages/AddPatient.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9BZGRQYXRpZW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Pages/Admin.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9BZG1pbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Pages/Appointments.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9BcHBvaW50bWVudHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Pages/Counter.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9Db3VudGVyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Pages/DoctorAppointmentDetails.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9Eb2N0b3JBcHBvaW50bWVudERldGFpbHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Pages/DoctorDetailsPage.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9Eb2N0b3JEZXRhaWxzUGFnZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Pages/Doctors.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9Eb2N0b3JzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Pages/Error.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9FcnJvci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Pages/Fileupload.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9GaWxldXBsb2FkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Pages/Home.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9Ib21lLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Pages/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9Mb2dpbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Pages/Notifications.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9Ob3RpZmljYXRpb25zLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Pages/PatientAppointmentDetails.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9QYXRpZW50QXBwb2ludG1lbnREZXRhaWxzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Pages/PatientDetailsPage.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9QYXRpZW50RGV0YWlsc1BhZ2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Pages/Patients.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9QYXRpZW50cy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Pages/Prescriptions.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9QcmVzY3JpcHRpb25zLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Pages/Profile.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9Qcm9maWxlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Pages/Weather.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9XZWF0aGVyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Routes.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Sb3V0ZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9fSW1wb3J0cy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Layout/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9MYXlvdXQvTWFpbkxheW91dC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-urxj7oecey
+
+[/Users/vishnuvardhanm/RiderProjects/HealthcareApp/HealthcareApp/Components/Layout/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9MYXlvdXQvTmF2TWVudS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-vdl7s076pd

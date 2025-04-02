@@ -1,0 +1,83 @@
+@page "/prescriptions"
+@inject IHttpClientFactory HttpClientFactory
+
+<h3 class="text-primary">Prescriptions</h3>
+
+@if (isLoading)
+{
+    <p class="text-info">Loading prescriptions...</p>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">
+        <strong>Error:</strong> @errorMessage
+    </div>
+}
+else if (prescriptions == null || prescriptions.Count == 0)
+{
+    <p class="text-warning">No prescriptions found for appointment ID 1.</p>
+}
+else
+{
+    <table class="table table-striped table-bordered table-hover">
+        <thead class="table-dark">
+        <tr>
+            <th>Issued Date</th>
+            <th>Medication Details</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var prescription in prescriptions)
+        {
+            <tr>
+                <td>@prescription.IssuedDate.ToString("yyyy-MM-dd")</td>
+                <td>@prescription.MedicationDetails</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Prescription> prescriptions;
+    private string errorMessage;
+    private bool isLoading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine("Fetching prescriptions for appointment ID 1...");
+
+        isLoading = true;
+        errorMessage = string.Empty;
+
+        try
+        {
+            var client = HttpClientFactory.CreateClient("ApiClient");
+
+            // Set the base address for the client
+            client.BaseAddress = new Uri("http://localhost:7035/");
+
+            // Fetch prescriptions for appointment ID 1
+            prescriptions = await client.GetFromJsonAsync<List<Prescription>>("api/prescriptions/1");
+
+            if (prescriptions == null || prescriptions.Count == 0)
+            {
+                errorMessage = "No prescriptions found for appointment ID 1.";
+            }
+        }
+        catch (HttpRequestException httpEx)
+        {
+            errorMessage = "Failed to fetch prescriptions. Please check your network or API status.";
+            Console.WriteLine(httpEx.Message);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "An unexpected error occurred while fetching prescriptions.";
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

@@ -1,0 +1,181 @@
+@page "/patients/{PatientId:int}/appointments"
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+@if (isLoading)
+{
+    <div class="alert alert-info">Loading appointments...</div>
+}
+else if (hasError)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else
+{
+    <div class="container my-4">
+        <h2 class="mb-4"><MudIcon Icon="@Icons.Material.Filled.DateRange" Class="me-1" />My Appointments</h2>
+
+        <!-- [A] Card for Appointments -->
+        <!-- Use .appointments-card to match the sidebar color. -->
+        <div class="card appointments-card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Appointments List</h5>
+                @if (appointments == null || appointments.Count == 0)
+                {
+                    <p class="text-muted">No appointments found.</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Appointment ID <MudIcon Icon="@Icons.Material.Filled.AdsClick" Class="me-1" /></th>
+                                    <th>Doctor <MudIcon Icon="@Icons.Material.Filled.LocalHospital" Class="me-1" /></th>
+                                    <th>Appointment Date <MudIcon Icon="@Icons.Material.Filled.CalendarToday" Class="me-1" /></th>
+                                    <th>Status <MudIcon Icon="@Icons.Material.Filled.IncompleteCircle" Class="me-1" /></th>
+                                    <th>Notes <MudIcon Icon="@Icons.Material.Filled.EditNote" Class="me-1" /></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var appt in appointments)
+                                {
+                                    <tr>
+                                        <!-- Appointment ID: Make it clickable -->
+                                        <td>
+                                            <a href="@($"/patients/{PatientId}/appointments/{appt.AppointmentId}")">
+                                                <strong><u>@appt.AppointmentId</u></strong>
+                                            </a>
+                                        </td>
+
+                                        <!-- Doctor's name -->
+                                        <td>
+                                            @if (appt.Doctor != null)
+                                            {
+                                                <strong>@appt.Doctor.FirstName @appt.Doctor.LastName</strong>
+                                            }
+                                            else
+                                            {
+                                                <em>Unknown Doctor</em>
+                                            }
+                                        </td>
+
+                                        <!-- Appointment date/time -->
+                                        <td>
+                                            @appt.AppointmentDateTime.ToLocalTime().ToString("g")
+                                        </td>
+
+                                        <!-- Status -->
+                                        <td>
+                                            @if (appt.Status == "Pending")
+                                            {
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            }
+                                            else if (appt.Status == "Accepted")
+                                            {
+                                                <span class="badge bg-success">Accepted</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">@appt.Status</span>
+                                            }
+                                        </td>
+
+                                        <!-- Short summary of notes -->
+                                        <td>@appt.Notes</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int PatientId { get; set; }
+
+    private bool isLoading = true;
+    private bool hasError = false;
+    private string errorMessage = "";
+
+    private List<Appointment> appointments;
+    private List<Notification> notifications;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var httpClient = HttpClientFactory.CreateClient("ApiClient");
+            
+            // Get appointments for the patient:
+            appointments = await httpClient.GetFromJsonAsync<List<Appointment>>($"appointments/patient/{PatientId}") 
+                           ?? new List<Appointment>();
+
+            // Get notifications for the patient:
+            var patient = await httpClient.GetFromJsonAsync<Patient>($"patients/{PatientId}");
+            notifications = patient?.Notifications ?? new List<Notification>();
+        }
+        catch (Exception ex)
+        {
+            hasError = true;
+            errorMessage = $"Failed to load data: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    // Simplified nested models for demonstration
+    private class Appointment
+    {
+        public int AppointmentId { get; set; }
+        public int PatientId { get; set; }
+        public int DoctorId { get; set; }
+        public DateTime AppointmentDateTime { get; set; }
+        public string Status { get; set; }
+        public string Notes { get; set; }
+        public Doctor Doctor { get; set; }
+    }
+
+    private class Doctor
+    {
+        public int DoctorId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
+
+    private class Patient
+    {
+        public int PatientId { get; set; }
+        public List<Notification> Notifications { get; set; } = new();
+    }
+
+    private class Notification
+    {
+        public string Message { get; set; }
+    }
+}
+
+<style>
+/* Match the gradient background from Patients Page */
+body {
+    margin: 0;
+    padding: 0;
+    background: #caf0f8 !important;
+    background-attachment: fixed;
+    background-size: cover;
+}
+
+/* Appointments card => match the sidebar color (#90e0ef) */
+.appointments-card {
+    background-color: #90e0ef; /* same teal as the patient page sidebar */
+    border-radius: 12px;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+    border: none;
+}
+</style>

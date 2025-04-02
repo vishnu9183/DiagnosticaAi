@@ -1,0 +1,143 @@
+@page "/add-doctor"
+@using HealthcareApp.Models
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavigationManager
+@using System.Net.Http.Json
+@rendermode InteractiveServer
+
+<div class="add-doctor-page">
+    <div class="form-card">
+        <h3 class="text-center mb-3">Add Doctor Form</h3>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger mb-2">@errorMessage</div>
+        }
+
+        <EditForm Model="@newDoctor" OnValidSubmit="HandleValidSubmit">
+            <div class="mb-2">
+                <label for="firstName" class="form-label">First Name<MudIcon Icon="@Icons.Material.Filled.DriveFileRenameOutline" Class="me-1" /></label>
+                <InputText id="firstName" class="form-control" @bind-Value="newDoctor.FirstName" />
+            </div>
+            <div class="mb-2">
+                <label for="lastName" class="form-label">Last Name<MudIcon Icon="@Icons.Material.Filled.DriveFileRenameOutline" Class="me-1" /></label>
+                <InputText id="lastName" class="form-control" @bind-Value="newDoctor.LastName" />
+            </div>
+            <div class="mb-2">
+                <label for="email" class="form-label">Email<MudIcon Icon="@Icons.Material.Filled.DriveFileRenameOutline" Class="me-1" /></label>
+                <InputText id="email" class="form-control" @bind-Value="newDoctor.Email" />
+            </div>
+            <div class="mb-2">
+                <label for="specialization" class="form-label">Specialization<MudIcon Icon="@Icons.Material.Filled.Star" Class="me-1" /></label>
+                <InputText id="specialization" class="form-control" @bind-Value="newDoctor.Specialization" />
+            </div>
+            <div class="mb-2">
+                <label for="phone" class="form-label">Phone Number<MudIcon Icon="@Icons.Material.Filled.LocalPhone" Class="me-1" /></label>
+                <InputText id="phone" class="form-control" @bind-Value="newDoctor.PhoneNumber" />
+            </div>
+
+            <!-- Simple text field for Availability (optional) -->
+            <div class="mb-2">
+                <label for="availability" class="form-label">Availability<MudIcon Icon="@Icons.Material.Filled.CheckCircle" Class="me-1" /></label>
+                <InputText id="availability" class="form-control" @bind-Value="availabilityString" />
+            </div>
+
+            <!-- Password field -->
+            <div class="mb-2">
+                <label for="password" class="form-label">Password<MudIcon Icon="@Icons.Material.Filled.Password" Class="me-1" /></label>
+                <InputText id="password" type="password" class="form-control" @bind-Value="password" />
+            </div>
+
+            <!-- Standard HTML button instead of MudButton -->
+            <button type="submit" class="btn btn-primary w-100 mt-3" disabled="@isSubmitting">
+                @(!isSubmitting ? "Submit" : "Submitting...")
+            </button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private Doctor newDoctor = new Doctor();
+    private string password = "";
+    private string availabilityString = "";
+    private bool isSubmitting = false;
+    private string errorMessage = "";
+
+    private async Task HandleValidSubmit()
+    {
+        isSubmitting = true;
+        errorMessage = "";
+
+        try
+        {
+            // Save password in passwordhash (adjust hashing if needed)
+            newDoctor.passwordhash = password;
+
+            // Optionally, process 'availabilityString' and update newDoctor.AvailableSlots
+
+            var httpClient = HttpClientFactory.CreateClient("ApiClient");
+            var response = await httpClient.PostAsJsonAsync("doctors", newDoctor);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // On success, navigate back to the doctors list
+                NavigationManager.NavigateTo("/doctors");
+            }
+            else
+            {
+                errorMessage = "Failed to add doctor. Something went wrong.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}
+
+<style>
+    /* Light pastel background for the page */
+    body {
+        background-color: #CAF0F8; 
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Center the card with some top margin */
+    .add-doctor-page {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+        padding-top: 5rem; /* spacing from top */
+    }
+
+    /* The white card for the form */
+    .form-card {
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+        padding: 2rem;
+        width: 400px; /* adjust width as needed */
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .mb-2 {
+        margin-bottom: 1rem;
+    }
+
+    .mt-3 {
+        margin-top: 1.5rem;
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+</style>

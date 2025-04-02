@@ -1,0 +1,147 @@
+@page "/doctors"
+@using HealthcareApp.Models
+@using System.Net.Http.Json
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<MudPaper Class="header-section d-flex align-items-center justify-content-between px-3 py-2" 
+          Style="background-color: #9EEAF9; border-radius: 12px; margin-bottom: 1rem;">
+    <div class="d-flex align-items-center">
+        <MudText Typo="Typo.h5" Class="fw-bold me-3">Doctors  <MudIcon Icon="@Icons.Material.Filled.LocalHospital" Class="me-1" /></MudText>
+        <!-- Search Field -->
+        <MudTextField @bind-Value="searchString" Placeholder="Search Doctors..." Immediate="true" 
+                      Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search"
+                      Class="search-box" />
+    </div>
+
+    <!-- Add Doctor Button -->
+    <MudButton Color="Color.Primary" Variant="Variant.Filled" Class="add-doctor-btn"
+               Style="background-color: #2F3A57;" 
+               OnClick="GoToAddDoctor">
+        Add Doctor  <MudIcon Icon="@Icons.Material.Filled.AddCircle" Class="me-1" />
+    </MudButton>
+</MudPaper>
+
+<!-- Main Content: Doctor Table -->
+<MudPaper Class="p-3" Style="border-radius:12px;">
+    <MudTable Items="filteredDoctors" Class="styled-doctor-table" Bordered="false" Hover="true" Striped="false">
+        <HeaderContent>
+            <MudTh>Name  <MudIcon Icon="@Icons.Material.Filled.DriveFileRenameOutline" Class="me-1" /></MudTh>
+            <MudTh>Specialization  <MudIcon Icon="@Icons.Material.Filled.Star" Class="me-1" /></MudTh>
+            <MudTh>Email  <MudIcon Icon="@Icons.Material.Filled.Email" Class="me-1" /></MudTh>
+            <MudTh></MudTh> <!-- Column for Delete button -->
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>
+                @($"Dr. {context.FirstName} {context.LastName}")
+            </MudTd>
+            <MudTd>
+                @context.Specialization
+            </MudTd>
+            <MudTd>
+                @context.Email
+            </MudTd>
+            <MudTd Align="Align.Right">
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                               Size="Size.Medium"
+                               OnClick="@(() => DeleteDoctor(context))" />
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private List<Doctor> doctors = new();
+    private string searchString = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var httpClient = HttpClientFactory.CreateClient("ApiClient");
+            // Fetch approved doctors from /api/doctors
+            doctors = await httpClient.GetFromJsonAsync<List<Doctor>>("doctors") ?? new List<Doctor>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching doctors: {ex.Message}");
+        }
+    }
+
+    // Filtered list based on search
+    private IEnumerable<Doctor> filteredDoctors => 
+        string.IsNullOrWhiteSpace(searchString)
+        ? doctors
+        : doctors.Where(d =>
+            (d.FirstName + " " + d.LastName).Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || d.Specialization.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || d.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase));
+
+    // Navigate to /add-doctor page
+    private void GoToAddDoctor()
+    {
+        NavigationManager.NavigateTo("/add-doctor");
+    }
+
+    // Directly delete a doctor without confirmation dialogs.
+    private async Task DeleteDoctor(Doctor doc)
+    {
+        try
+        {
+            var httpClient = HttpClientFactory.CreateClient("ApiClient");
+            var response = await httpClient.DeleteAsync($"doctors/{doc.DoctorId}");
+            if (response.IsSuccessStatusCode)
+            {
+                doctors.Remove(doc);
+            }
+            else
+            {
+                Console.WriteLine("Failed to delete doctor. Something went wrong.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting doctor: {ex.Message}");
+        }
+    }
+
+    // Simplified Doctor model (adjust if needed)
+    private class Doctor
+    {
+        public int DoctorId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Specialization { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+    }
+}
+
+<style>
+    /* Styling for the header section */
+    .header-section {
+        background-color: #9EEAF9; /* Light Blue */
+        border-radius: 12px;
+        margin-bottom: 1rem;
+    }
+
+    /* Search box styling */
+    .search-box {
+        width: 200px;
+        margin-right: 1rem;
+    }
+
+    /* Ensure the add doctor button has white text */
+    .add-doctor-btn {
+        color: #ffffff !important;
+    }
+
+    /* Custom styling for the doctor table header */
+    .styled-doctor-table thead {
+        background-color: #343a40; /* Dark background */
+    }
+    .styled-doctor-table thead th {
+        color: #ffffff !important;  /* White text for header cells */
+    }
+</style>

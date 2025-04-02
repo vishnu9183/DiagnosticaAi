@@ -1,0 +1,153 @@
+@page "/add-patient"
+@using HealthcareApp.Models
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavigationManager
+@using System.Net.Http.Json
+@rendermode InteractiveServer
+
+<div class="add-patient-page">
+    <div class="form-card">
+        <h3 class="text-center mb-3">Add Patient Form</h3>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger mb-2">@errorMessage</div>
+        }
+
+        @if (showSuccessSnackbar)
+        {
+            <div class="alert alert-success" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 999;">
+                Patient record inserted!
+            </div>
+        }
+
+        <EditForm Model="@newPatient" OnValidSubmit="HandleValidSubmit">
+            <div class="mb-2">
+                <label for="firstName" class="form-label">First Name<MudIcon Icon="@Icons.Material.Filled.DriveFileRenameOutline" Class="me-1" /></label>
+                <InputText id="firstName" class="form-control" @bind-Value="newPatient.FirstName" />
+            </div>
+            <div class="mb-2">
+                <label for="lastName" class="form-label">Last Name<MudIcon Icon="@Icons.Material.Filled.DriveFileRenameOutline" Class="me-1" /></label>
+                <InputText id="lastName" class="form-control" @bind-Value="newPatient.LastName" />
+            </div>
+            <div class="mb-2">
+                <label for="email" class="form-label">Email<MudIcon Icon="@Icons.Material.Filled.DriveFileRenameOutline" Class="me-1" /></label>
+                <InputText id="email" class="form-control" @bind-Value="newPatient.Email" />
+            </div>
+            <div class="mb-2">
+                <label for="phone" class="form-label">Phone Number<MudIcon Icon="@Icons.Material.Filled.LocalPhone" Class="me-1" /></label>
+                <InputText id="phone" class="form-control" @bind-Value="newPatient.PhoneNumber" />
+            </div>
+            <div class="mb-2">
+                <label for="dateOfBirth" class="form-label">Date of Birth<MudIcon Icon="@Icons.Material.Filled.DateRange" Class="me-1" /></label>
+                <InputDate id="dateOfBirth" class="form-control" @bind-Value="newPatient.DateOfBirth" />
+            </div>
+            <div class="mb-2">
+                <label for="gender" class="form-label">Gender<MudIcon Icon="@Icons.Material.Filled.Circle" Class="me-1" /></label>
+                <InputText id="gender" class="form-control" @bind-Value="newPatient.Gender" />
+            </div>
+            <div class="mb-2">
+                <label for="address" class="form-label">Address<MudIcon Icon="@Icons.Material.Filled.MapsHomeWork" Class="me-1" /></label>
+                <InputText id="address" class="form-control" @bind-Value="newPatient.Address" />
+            </div>
+            <!-- Password field -->
+            <div class="mb-2">
+                <label for="password" class="form-label">Password<MudIcon Icon="@Icons.Material.Filled.Password" Class="me-1" /></label>
+                <InputText id="password" type="password" class="form-control" @bind-Value="password" />
+            </div>
+            <button type="submit" class="btn btn-primary w-100 mt-3" disabled="@isSubmitting">
+                @(!isSubmitting ? "Submit" : "Submitting...")
+            </button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private Patient newPatient = new Patient();
+    private string password = "";
+    private bool isSubmitting = false;
+    private string errorMessage = "";
+    private bool showSuccessSnackbar = false;
+
+    private async Task HandleValidSubmit()
+    {
+        isSubmitting = true;
+        errorMessage = "";
+
+        try
+        {
+            // Save the password as a hash (adjust hashing if needed)
+            newPatient.passwordhash = password;
+            // Ensure DateOfBirth is treated as UTC to avoid PostgreSQL errors
+            newPatient.DateOfBirth = DateTime.SpecifyKind(newPatient.DateOfBirth, DateTimeKind.Utc);
+
+            var httpClient = HttpClientFactory.CreateClient("ApiClient");
+            var response = await httpClient.PostAsJsonAsync("patients", newPatient);
+
+            if (response.IsSuccessStatusCode)
+            {
+                showSuccessSnackbar = true;
+                StateHasChanged();
+
+                // Hide the snackbar after 5 seconds then navigate to the patients list
+                await Task.Delay(5000);
+                NavigationManager.NavigateTo("/patients");
+            }
+            else
+            {
+                errorMessage = "Failed to add patient. Something went wrong.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}
+
+<style>
+    /* Light pastel background for the page */
+    body {
+        background-color: #CAF0F8;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Center the card with some top margin */
+    .add-patient-page {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+        padding-top: 5rem; /* spacing from top */
+    }
+
+    /* The white card for the form */
+    .form-card {
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        padding: 2rem;
+        width: 400px; /* adjust width as needed */
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .mb-2 {
+        margin-bottom: 1rem;
+    }
+
+    .mt-3 {
+        margin-top: 1.5rem;
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+</style>

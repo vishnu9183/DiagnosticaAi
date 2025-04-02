@@ -1,0 +1,221 @@
+@page "/doctors/{DoctorId:int}/appointments/{AppointmentId:int}"
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+@if (isLoading)
+{
+    <div class="alert alert-info">Loading appointment details...</div>
+}
+else if (hasError)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else if (appointment == null)
+{
+    <div class="alert alert-warning">Appointment not found.</div>
+}
+else
+{
+    <!-- Main container with some margin -->
+    <div class="container my-4">
+        <h2>Appointment Details <MudIcon Icon="@Icons.Material.Filled.Notes" Class="me-1" /></h2>
+        <p><strong>Appointment ID:</strong> @appointment.AppointmentId</p>
+        <p><strong>Patient:</strong> @($"{appointment.Patient?.FirstName} {appointment.Patient?.LastName}")</p>
+        <p><strong>Date/Time:</strong> @appointment.AppointmentDateTime.ToLocalTime().ToString("g")</p>
+        <p><strong>Status:</strong> @appointment.Status</p>
+
+        @if (appointment.Status == "Rejected")
+        {
+            <div class="alert alert-danger">
+                This appointment has been rejected. No further actions are allowed.
+            </div>
+        }
+        else
+        {
+            <!-- AI Analysis (read-only) -->
+            <div class="card my-3 shadow-sm ai-analysis">
+                <div class="card-body">
+                    <h5 class="card-title">AI Analysis <MudIcon Icon="@Icons.Material.Filled.AutoGraph" Class="me-1" /></h5>
+                    <p>
+                        @(string.IsNullOrWhiteSpace(appointment.AiOutput)
+                            ? "No AI analysis available."
+                            : appointment.AiOutput)
+                    </p>
+                </div>
+            </div>
+
+            <!-- Patient Notes (read-only) -->
+            <div class="card my-3 shadow-sm patient-notes">
+                <div class="card-body">
+                    <h5 class="card-title">Patient Notes <MudIcon Icon="@Icons.Material.Filled.Note" Class="me-1" /></h5>
+                    <p>
+                        @(string.IsNullOrWhiteSpace(appointment.PatientNotes)
+                            ? "No patient notes available."
+                            : appointment.PatientNotes)
+                    </p>
+                </div>
+            </div>
+
+            <!-- Doctor's Notes Section (editable by doctor) -->
+            <div class="card my-3 shadow-sm your-notes">
+                <div class="card-body">
+                    <h5 class="card-title">Your Notes <MudIcon Icon="@Icons.Material.Filled.LocalHospital" Class="me-1" /></h5>
+                    <textarea class="form-control mb-2" @bind="appointment.DoctorNotes" rows="4"></textarea>
+                    <button class="btn btn-primary" @onclick="SaveDoctorNotes">
+                        Save My Notes <MudIcon Icon="@Icons.Material.Filled.SaveAs" Class="me-1" />
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<!-- Hovering Snackbar for Success Message -->
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success"
+         style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 999; min-width: 300px; text-align: center;">
+        @successMessage
+    </div>
+}
+
+@code {
+    [Parameter] public int DoctorId { get; set; }
+    [Parameter] public int AppointmentId { get; set; }
+
+    private Appointment appointment;
+    private bool isLoading = true;
+    private bool hasError = false;
+    private string errorMessage = "";
+    private string successMessage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var client = HttpClientFactory.CreateClient("ApiClient");
+            appointment = await client.GetFromJsonAsync<Appointment>($"appointments/{AppointmentId}");
+            if (appointment == null)
+            {
+                hasError = true;
+                errorMessage = "Appointment not found.";
+            }
+        }
+        catch (Exception ex)
+        {
+            hasError = true;
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SaveDoctorNotes()
+    {
+        try
+        {
+            var client = HttpClientFactory.CreateClient("ApiClient");
+            var payload = new NotesDto { Notes = appointment.DoctorNotes };
+            var response = await client.PutAsJsonAsync($"appointments/{AppointmentId}/doctornotes", payload);
+            if (!response.IsSuccessStatusCode)
+            {
+                errorMessage = "Failed to save your notes.";
+            }
+            else
+            {
+                successMessage = "Your notes have been saved successfully!";
+                // Show success for 1 minute, then clear
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(60000);
+                    successMessage = "";
+                    await InvokeAsync(StateHasChanged);
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    private class NotesDto
+    {
+        public string Notes { get; set; }
+    }
+
+    private class Appointment
+    {
+        public int AppointmentId { get; set; }
+        public int PatientId { get; set; }
+        public int DoctorId { get; set; }
+        public DateTime AppointmentDateTime { get; set; }
+        public string Status { get; set; }
+        public string PatientNotes { get; set; }
+        public string DoctorNotes { get; set; }
+        public string AiOutput { get; set; }
+        public Patient Patient { get; set; }
+    }
+
+    private class Patient
+    {
+        public int PatientId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
+}
+
+<style>
+/* 1) Entire page background #caf0f8 */
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-color: #caf0f8;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Let .container push down if you have a footer or pinned elements 
+   (If no pinned footer, you can skip flex layout on container) */
+:global(.container),
+:global(.container-fluid),
+:global(.my-4),
+:global(.my-5) {
+    flex: 1;
+}
+
+/* 2) AI Analysis Card => same pastel-green style as Predicted Disease.
+   We'll mimic an alert-success look: #d1e7dd or a custom pastel green */
+.ai-analysis {
+    background-color: #d1e7dd;
+    border-radius: 12px;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+    margin-bottom: 1rem;
+}
+
+/* 3) Patient Notes Card => same style as your "patient notes" in the Patients page 
+   or use a pastel color from that page (#e9edc9, #f8c8d8, etc.). 
+   We'll pick #e9edc9: */
+.patient-notes {
+    background-color: #e9edc9;
+    border-radius: 12px;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+    margin-bottom: 1rem;
+}
+
+/* 4) Your Notes => same color as appointment card (#ccd5ae) */
+.your-notes {
+    background-color: #ccd5ae;
+    border-radius: 12px;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+    margin-bottom: 1rem;
+}
+
+/* If you want a pinned footer, you can create a .footer class, 
+   but your snippet doesn't show a pinned footer here. 
+   If you do, follow the same approach used in other pages. */
+</style>

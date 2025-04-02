@@ -1,0 +1,60 @@
+﻿@page "/counter"
+@rendermode InteractiveServer
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @currentCount</p>
+
+<!-- Button to increment count -->
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+<hr />
+
+<h3>User Input Form</h3>
+
+<!-- ✅ Fix: Provide a Model in EditForm -->
+<EditForm Model="@inputModel" OnValidSubmit="SubmitInput">
+    <DataAnnotationsValidator />
+    
+    <div class="mb-3">
+        <label for="userInput" class="form-label">Enter something:</label>
+        <InputText id="userInput" class="form-control" @bind-Value="inputModel.UserText" />
+    </div>
+    
+    <button type="submit" class="btn btn-success">Submit</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(submittedText))
+{
+    <div class="alert alert-info mt-3">
+        <strong>You entered:</strong> @submittedText
+    </div>
+}
+
+@code {
+    private int currentCount = 0;
+    private string submittedText = "";
+    
+    // ✅ Fix: Define a model for EditForm
+    private InputModel inputModel = new();
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+    private void SubmitInput()
+    {
+        submittedText = inputModel.UserText; // Save input to display
+        inputModel.UserText = ""; // Clear input field after submit
+        StateHasChanged(); // Ensure UI updates
+    }
+
+    // ✅ Fix: Define the model class
+    private class InputModel
+    {
+        public string UserText { get; set; } = "";
+    }
+}

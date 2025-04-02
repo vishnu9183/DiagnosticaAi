@@ -1,0 +1,238 @@
+@page "/doctors/{DoctorId:int}"
+@using Microsoft.AspNetCore.Components
+@using System.Net.Http.Json
+@using HealthcareApp.Models
+@inject IHttpClientFactory HttpClientFactory
+@rendermode InteractiveServer
+
+@if (appointments == null || appointments.Count == 0)
+{
+    <p class="text-warning">No appointments found for this doctor.</p>
+}
+else
+{
+    <!-- Container for the title and table -->
+    <div class="container my-5" style="margin-top: 3rem;">
+        <h3 class="text-primary text-center">
+            Appointments for @LastName <MudIcon Icon="@Icons.Material.Filled.DateRange" Class="me-1" />
+        </h3>
+
+        <table class="table table-striped table-bordered table-hover mt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th>Appointment ID <MudIcon Icon="@Icons.Material.Filled.AdsClick" Class="me-1" /></th>
+                    <th>Doctor Name</th>
+                    <th>Patient Name <MudIcon Icon="@Icons.Material.Filled.AdsClick" Class="me-1" /></th>
+                    <th>Appointment DateTime</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var appt in appointments)
+                {
+                    <tr>
+                        <td>
+                            <a href="@($"/doctors/{DoctorId}/appointments/{appt.AppointmentId}")">
+                                <strong><u>@appt.AppointmentId</u></strong>
+                            </a>
+                        </td>
+                        <td>@($"{appt.Doctor.FirstName} {appt.Doctor.LastName}")</td>
+                        <td>
+                            <a href="@($"/patients/{appt.Patient.PatientId}/profile")">
+                                <u>@($"{appt.Patient.FirstName} {appt.Patient.LastName}")</u>
+                            </a>
+                        </td>
+                        <td>@appt.AppointmentDateTime</td>
+                        <td>@appt.Status</td>
+                        <td>
+                            @if (appt.Status == "Pending")
+                            {
+                                <button class="btn btn-sm btn-success"
+                                        @onclick="() => AcceptAppointment(appt.AppointmentId)">
+                                    Accept
+                                </button>
+                                <button class="btn btn-sm btn-danger ml-2"
+                                        @onclick="() => RejectAppointment(appt.AppointmentId)">
+                                    Reject
+                                </button>
+                            }
+                            else if (appt.Status == "Accepted")
+                            {
+                                <span class="text-success">Already Accepted <MudIcon Icon="@Icons.Material.Filled.Check" Class="me-1" /></span>
+                            }
+                            else if (appt.Status == "Rejected")
+                            {
+                                <span class="text-danger">Rejected <MudIcon Icon="@Icons.Material.Filled.Close" Class="me-1" /></span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+
+<div class="icon-row text-center my-4">
+    <!-- Round icons referencing your Assets folder -->
+    <img src="Assets/icon1.png" alt="Icon 1" class="round-icon me-3" />
+    <img src="Assets/icon2.png" alt="Icon 2" class="round-icon me-3" />
+    <img src="Assets/icon3.png" alt="Icon 3" class="round-icon" />
+</div>
+
+
+@code {
+    private List<Doctor> doctors;
+    private bool isLoading = true;
+    private bool hasError = false;
+    private string errorMessage = "";
+    [Parameter] public int DoctorId { get; set; }
+    private List<Appointment> appointments = new();
+    private string LastName;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var httpClient = HttpClientFactory.CreateClient("ApiClient");
+        
+            // Fetch all doctors if needed
+            doctors = await httpClient.GetFromJsonAsync<List<Doctor>>("doctors");
+
+            // Fetch appointments for this doctor
+            appointments = await httpClient.GetFromJsonAsync<List<Appointment>>($"appointments/doctor/{DoctorId}");
+            
+            if (appointments != null && appointments.Count > 0)
+            {
+                // Prepend "Dr. " to the doctor's name for the page title
+                LastName = $"Dr. {appointments[0].Doctor.FirstName} {appointments[0].Doctor.LastName}";
+            }
+        }
+        catch (Exception ex)
+        {
+            hasError = true;
+            errorMessage = $"Failed to load data. Details: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+    
+    private async Task AcceptAppointment(int appointmentId)
+    {
+        try
+        {
+            var httpClient = HttpClientFactory.CreateClient("ApiClient");
+            var response = await httpClient.PutAsync($"appointments/{appointmentId}/accept", null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Refresh appointments after update
+                appointments = await httpClient.GetFromJsonAsync<List<Appointment>>($"appointments/doctor/{DoctorId}");
+            }
+            else
+            {
+                errorMessage = "Could not accept appointment. Something went wrong.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+    }
+    
+    private async Task RejectAppointment(int appointmentId)
+    {
+        try
+        {
+            var httpClient = HttpClientFactory.CreateClient("ApiClient");
+            var response = await httpClient.PutAsync($"appointments/{appointmentId}/reject", null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Refresh appointments after update
+                appointments = await httpClient.GetFromJsonAsync<List<Appointment>>($"appointments/doctor/{DoctorId}");
+            }
+            else
+            {
+                errorMessage = "Could not reject appointment. Something went wrong.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+    }
+
+    // Simplified models for demonstration
+    private class Appointment
+    {
+        public int AppointmentId { get; set; }
+        public int PatientId { get; set; }
+        public int DoctorId { get; set; }
+        public DateTime AppointmentDateTime { get; set; }
+        public string Status { get; set; }
+        public Doctor Doctor { get; set; }
+        public Patient Patient { get; set; }
+    }
+
+    private class Doctor
+    {
+        public int DoctorId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Specialization { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+    }
+
+    private class Patient
+    {
+        public int PatientId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
+}
+
+<style>
+/* Make entire page #caf0f8, and use flex layout to push footer to bottom */
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-color: #caf0f8;
+    display: flex;
+    flex-direction: column;
+}
+
+/* The container or anything with "my-4/5" can expand */
+:global(.container),
+:global(.container-fluid),
+:global(.my-4),
+:global(.my-5) {
+    flex: 1; /* allows main content to stretch */
+}
+
+.icon-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 100px; /* Adds space between icons */
+}
+
+.round-icon {
+    width: 250px;
+    height: 250px;
+    object-fit: cover;
+}
+
+/* Footer pinned at bottom */
+.footer {
+    background-color: #343a40; 
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+}
+</style>

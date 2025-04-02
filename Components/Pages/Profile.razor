@@ -1,0 +1,281 @@
+@page "/patients/{PatientId:int}/profile"
+@inject IHttpClientFactory HttpClientFactory
+@rendermode InteractiveServer
+
+@if (isLoading)
+{
+    <div class="text-info">Loading patient profile...</div>
+}
+else if (hasError)
+{
+    <div class="alert alert-danger">
+        <strong>Error:</strong> @errorMessage
+    </div>
+}
+else if (patient == null)
+{
+    <div class="text-warning">No patient found.</div>
+}
+else
+{
+    <!-- Main container -->
+    <div class="container-fluid p-4">
+
+        <h2 class="mb-4"> <MudIcon Icon="@Icons.Material.Filled.Person" Class="me-1" />Patient Profile</h2>
+
+        <div class="row">
+            <!-- [1] LEFT COLUMN: Profile Card -->
+            <div class="col-md-4">
+                <div class="card mb-3 shadow-sm profile-card" style="border-radius: 12px;">
+                    <img src="/Assets/Headshot.png" class="card-img-top" alt="Profile Picture" 
+                         style="border-top-left-radius: 12px; border-top-right-radius: 12px;" />
+                    
+                    <div class="card-body">
+                        <h4 class="card-title">@($"{patient.FirstName} {patient.LastName}")</h4>
+                        <p class="card-text">
+                            <small class="text-muted">Last login: N/A</small>
+                        </p>
+                        <p class="card-text">
+                            <strong>Email:</strong> @patient.Email
+                            <br />
+                            <strong>Phone:</strong> @patient.PhoneNumber
+                            <br />
+                            <strong>Gender:</strong> @patient.Gender
+                            <br />
+                        </p>
+                        <!-- Save button using the same green (btn-success) from your Patients Page 'Submit' -->
+                        <button class="btn btn-success">Save</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- [2] RIGHT COLUMN: Additional Info -->
+            <div class="col-md-8">
+                <!-- Additional Details card => matches 'doctor-recommendation' color (#e9edc9) -->
+                <div class="card mb-3 shadow-sm additional-details" style="border-radius: 12px;">
+                    <div class="card-body">
+                        <h5 class="card-title"> <MudIcon Icon="@Icons.Material.Filled.Create" Class="me-1" />Additional Details</h5>
+                        <p class="card-text">
+                            <strong>Date of Birth:</strong> @patient.DateOfBirth.ToShortDateString()
+                            <br />
+                            <strong>Address:</strong> @patient.Address
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Health History => matches 'appointment' color (#ccd5ae) -->
+                <div class="card mb-3 shadow-sm health-history" style="border-radius: 12px;">
+                    <div class="card-body">
+                        <h5 class="card-title"><MudIcon Icon="@Icons.Material.Filled.History" Class="me-1" />Health History</h5>
+                        
+                        @if (patient.HealthHistory != null && patient.HealthHistory.Any())
+                        {
+                            <ul class="list-group list-group-flush">
+                                @foreach (var historyItem in PaginatedHealthHistory)
+                                {
+                                    <li class="list-group-item">@historyItem</li>
+                                }
+                            </ul>
+
+                            <!-- Pagination Controls -->
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <!-- Navy buttons, same as .btn-primary in your Patients Page -->
+                                <button class="btn btn-primary"
+                                        @onclick="GoPrevious"
+                                        disabled="@(!CanGoPrevious)">
+                                    Previous
+                                </button>
+                                <span>Page @currentPage of @TotalPages</span>
+                                <button class="btn btn-primary"
+                                        @onclick="GoNext"
+                                        disabled="@(!CanGoNext)">
+                                    Next
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted">No history available.</p>
+                        }
+                    </div>
+                </div>
+
+                <!-- Notifications => keep the default white background -->
+                <div class="card shadow-sm" style="border-radius: 12px;">
+                    <div class="card-body">
+                        <h5 class="card-title"><MudIcon Icon="@Icons.Material.Filled.Notifications" Class="me-1" />Notifications</h5>
+                        
+                        @if (patient.Notifications != null && patient.Notifications.Any())
+                        {
+                            <ul class="list-group list-group-flush">
+                                @foreach (var note in patient.Notifications)
+                                {
+                                    <li class="list-group-item">@note.Message</li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <p class="text-muted">No notifications at this time.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private Patient patient;
+    private bool isLoading;
+    private bool hasError;
+    private string errorMessage;
+
+    // Pagination fields
+    private int currentPage = 1;
+    private const int pageSize = 10;
+
+    [Parameter] public int PatientId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        hasError = false;
+        errorMessage = string.Empty;
+
+        try
+        {
+            var httpClient = HttpClientFactory.CreateClient("ApiClient");
+            patient = await httpClient.GetFromJsonAsync<Patient>($"patients/{PatientId}");
+            
+            if (patient == null)
+            {
+                hasError = true;
+                errorMessage = "Patient not found.";
+            }
+        }
+        catch (Exception ex)
+        {
+            hasError = true;
+            errorMessage = $"Failed to load patient: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+        Console.WriteLine($"[Debug] HealthHistory count = {patient?.HealthHistory?.Count ?? 0}"); 
+        Console.WriteLine($"[Debug] TotalPages = {TotalPages}");
+    }
+
+    // Only show items for the current page
+    private IEnumerable<string> PaginatedHealthHistory
+    {
+        get
+        {
+            if (patient?.HealthHistory == null)
+                return Enumerable.Empty<string>();
+
+            return patient.HealthHistory
+                .Skip((currentPage - 1) * pageSize)
+                .Take(pageSize);
+        }
+    }
+
+    // Compute total pages
+    private int TotalPages
+    {
+        get
+        {
+            if (patient?.HealthHistory == null || patient.HealthHistory.Count == 0)
+                return 1;
+
+            return (int)Math.Ceiling(patient.HealthHistory.Count / (double)pageSize);
+        }
+    }
+
+    private bool CanGoPrevious => currentPage > 1;
+    private bool CanGoNext => currentPage < TotalPages;
+
+    private void GoPrevious()
+    {
+        if (CanGoPrevious)
+        {
+            currentPage--;
+        }
+    }
+
+    private void GoNext()
+    {
+        if (CanGoNext)
+        {
+            currentPage++;
+        }
+    }
+
+    private class Patient
+    {
+        public int PatientId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+        public DateTime DateOfBirth { get; set; }
+        public string Gender { get; set; }
+        public string Address { get; set; }
+        public List<string> UploadedLabReports { get; set; }
+        public List<string> HealthHistory { get; set; }
+        public List<Notification> Notifications { get; set; }
+        public string passwordhash { get; set; }
+    }
+
+    private class Notification
+    {
+        public string Message { get; set; }
+    }
+}
+
+<style>
+/* (1) Same pastel gradient background as your Patients Page */
+body {
+    margin: 0;
+    padding: 0;
+    background: #caf0f8 !important;
+    background-attachment: fixed;
+    background-size: cover;
+}
+
+/* (2) Profile Card => same color as the symptom checker or main right container (#caf0f8) */
+.profile-card {
+    background-color: #fefae0;
+}
+
+/* Additional Details => match 'doctor-recommendation' color (#e9edc9) */
+.additional-details {
+    background-color: #e9edc9;
+}
+
+/* Health History => match 'appointment' color (#ccd5ae) */
+.health-history {
+    background-color: #ccd5ae;
+}
+
+/* Let white remain for Notifications card, so no special .notifications class used */
+
+/* Buttons:
+   - 'Save' is .btn-success => matching 'Submit' from your Patients Page.
+   - 'Previous' and 'Next' use .btn-primary => navy color from your Patients Page
+*/
+
+/* Overwrite .btn-primary with navy (#2F3B52) if you want that consistent look: */
+.btn-primary {
+    background-color: #2F3B52;
+    border: none;
+    color: #fff;
+    border-radius: 30px;
+}
+
+/* Keep .btn-success for the 'Save' and 'Submit' with rounded corners if desired */
+.btn-success {
+    border-radius: 30px;
+}
+</style>

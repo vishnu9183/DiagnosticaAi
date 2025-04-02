@@ -1,0 +1,148 @@
+@page "/patients"
+@using HealthcareApp.Models
+@using System.Net.Http.Json
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<MudPaper Class="header-section d-flex align-items-center justify-content-between px-3 py-2" 
+          Style="background-color: #9EEAF9; border-radius: 12px; margin-bottom: 1rem;">
+    <div class="d-flex align-items-center">
+        <MudText Typo="Typo.h5" Class="fw-bold me-3">Patients  <MudIcon Icon="@Icons.Material.Filled.Person" Class="me-1" /></MudText>
+        <!-- Search Field -->
+        <MudTextField @bind-Value="searchString" Placeholder="Search Patients..." Immediate="true" 
+                      Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search"
+                      Class="search-box" />
+    </div>
+    <!-- Add Patient Button -->
+    <MudButton Color="Color.Primary" Variant="Variant.Filled" Class="add-patient-btn"
+               Style="background-color: #2F3A57;" 
+               OnClick="GoToAddPatient">
+        Add Patient  <MudIcon Icon="@Icons.Material.Filled.AddCircle" Class="me-1" />
+    </MudButton>
+</MudPaper>
+
+<!-- Main Content: Patients Table -->
+<MudPaper Class="p-3" Style="border-radius:12px;">
+    <MudTable Items="filteredPatients" Bordered="false" Hover="true" Striped="false" Class="styled-patient-table">
+        <HeaderContent>
+            <MudTh>Name <MudIcon Icon="@Icons.Material.Filled.DriveFileRenameOutline" Class="me-1" /></MudTh>
+            <MudTh>Email <MudIcon Icon="@Icons.Material.Filled.DriveFileRenameOutline" Class="me-1" /></MudTh>
+            <MudTh>Phone <MudIcon Icon="@Icons.Material.Filled.LocalPhone" Class="me-1" /></MudTh>
+            <MudTh></MudTh> <!-- Column for Delete button -->
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>
+                @($"{context.FirstName} {context.LastName}")
+            </MudTd>
+            <MudTd>
+                @context.Email
+            </MudTd>
+            <MudTd>
+                @context.PhoneNumber
+            </MudTd>
+            <MudTd Align="Align.Right">
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                               Size="Size.Medium" 
+                               OnClick="@(() => DeletePatient(context))" />
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private List<Patient> patients = new();
+    private string searchString = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var httpClient = HttpClientFactory.CreateClient("ApiClient");
+            // Fetch patient records from /api/patients
+            patients = await httpClient.GetFromJsonAsync<List<Patient>>("patients") ?? new List<Patient>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching patients: {ex.Message}");
+        }
+    }
+
+    // Filter patients based on the search field
+    private IEnumerable<Patient> filteredPatients => 
+        string.IsNullOrWhiteSpace(searchString)
+        ? patients
+        : patients.Where(p =>
+            ($"{p.FirstName} {p.LastName}").Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || p.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || p.PhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase));
+
+    // Navigate to the Add Patient page
+    private void GoToAddPatient()
+    {
+        NavigationManager.NavigateTo("/add-patient");
+    }
+
+    // Directly delete a patient without a confirmation dialog
+    private async Task DeletePatient(Patient patient)
+    {
+        try
+        {
+            var httpClient = HttpClientFactory.CreateClient("ApiClient");
+            // Updated URL to match the controller's route ("api/patients")
+            var response = await httpClient.DeleteAsync($"patients/{patient.PatientId}");
+            if (response.IsSuccessStatusCode)
+            {
+                patients.Remove(patient);
+                StateHasChanged();
+            }
+            else
+            {
+                Console.WriteLine("Failed to delete patient. Something went wrong.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting patient: {ex.Message}");
+        }
+    }
+
+    // Simplified Patient model (adjust according to your actual model)
+    private class Patient
+    {
+        public int PatientId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+    }
+}
+
+<style>
+    .search-box {
+        width: 200px;
+        margin-right: 1rem;
+    }
+
+    .add-patient-btn {
+        color: #ffffff !important;
+    }
+
+    .header-section {
+        background-color: #9EEAF9;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+    }
+
+    /* Table styling: dark header row with white text */
+    .styled-patient-table thead {
+        background-color: #343a40; /* Dark header row */
+    }
+    .styled-patient-table thead th {
+        color: #ffffff !important; /* Force white text in header cells */
+    }
+    /* Optional row separator */
+    .styled-patient-table tbody tr td {
+        border-bottom: 1px solid #dee2e6;
+    }
+</style>

@@ -1,0 +1,15 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<div class="page">
+    <main>
+        @Body
+    </main>
+    <footer>
+        <p>&copy; @(DateTime.Now.Year) Diagnostica. All rights reserved.</p>
+    </footer>
+</div>
