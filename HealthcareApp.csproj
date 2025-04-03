@@ -25,22 +25,30 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="ServiceAccount\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Compile Remove="Components\Pages\Patients.razor.cs" />
       <Compile Remove="Components\Pages\_Host.cshtml.cs" />
       <Compile Remove="Components\Pages\Doctors.cshtml.cs" />
+      <Compile Remove="ServiceAccount\**" />
     </ItemGroup>
 
     <ItemGroup>
       <Content Remove="Components\Pages\Doctors.cshtml" />
       <Content Remove="Components\Pages\_Host.cshtml" />
+      <Content Remove="ServiceAccount\imposing-timer-448902-k6-c941aa87f8d5.json" />
+      <Content Remove="ServiceAccount\**" />
     </ItemGroup>
 
     <ItemGroup>
       <None Include="wwwroot\Assets\Headshot.png" />
+      <None Remove="ServiceAccount\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="ServiceAccount\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="ServiceAccount\imposing-timer-448902-k6-c941aa87f8d5.json" />
     </ItemGroup>
 
 </Project>
