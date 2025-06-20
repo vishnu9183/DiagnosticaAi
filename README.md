@@ -1,6 +1,8 @@
 Diagnostica Healthcare Management System
 Diagnostica is a comprehensive healthcare management system that seamlessly integrates advanced AI capabilities into a native full-stack application. Built with .NET and Blazor for the front-end and back-end—and enhanced with Python Flask microservices for AI using the Gemini Flash 2.0 model—Diagnostica streamlines patient management, appointment scheduling, and diagnostic insights. The system uses Google Cloud PostgreSQL for secure and scalable data storage.
 
+Link to Demo - https://www.linkedin.com/posts/activity-7313369373748994049-01Pf?utm_source=share&utm_medium=member_desktop&rcm=ACoAADEwR2kBiQgcJFfgSac1eg1K1OxaYS5akc0
+
 Table of Contents
 Features
 
@@ -116,4 +118,6 @@ PUT /api/appointments/{id}/patientnotes – Update patient notes
 PUT /api/appointments/{id}/doctornotes – Update doctor notes
 
 PUT /api/appointments/{id}/aioutput – Update AI output
+
+
 
